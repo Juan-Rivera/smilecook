@@ -1,18 +1,38 @@
 from flask import Flask
+from flask_migrate import Migrate
 from flask_restful import Api
 
-# import resource classes
+from config import Config
+from extensions import db
+from models.user import User
 from resources.recipe import RecipeListResource, RecipeResource, RecipePublishResource
 
-# initialize app, and api here (Api basically does some behind the scenes stuff for us so we don't have to :) )
-app = Flask(__name__)
-api = Api(app)
 
-# adding endpoints here, match endpoints with the specific resource class you want it to hit
-api.add_resource(RecipeListResource, '/recipes')
-api.add_resource(RecipeResource, '/recipes/<int:recipe_id>')
-api.add_resource(RecipePublishResource, '/recipes/<int:recipe_id>/publish')
+# initialize app with config from files config.py
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    register_extensions(app)
+    register_resources(app)
+
+    return app
+
+
+def register_extensions(app):
+    db.init_app(app)
+    migrate = Migrate(app, db)
+
+
+def register_resources(app):
+    api = Api(app)
+
+    # adding endpoints here, match endpoints with the specific resource class you want it to hit
+    api.add_resource(RecipeListResource, '/recipes')
+    api.add_resource(RecipeResource, '/recipes/<int:recipe_id>')
+    api.add_resource(RecipePublishResource, '/recipes/<int:recipe_id>/publish')
+
 
 if __name__ == '__main__':
-    # running app, setting port to localhost:5000, debug true
-    app.run(port=5000, debug=True)
+    app = create_app()
+    app.run()
