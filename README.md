@@ -27,10 +27,13 @@ Project structure:
 
 ```
 
-* app.py - flask application initialization.
+* migrations/ holds migration database tables
 * models/ - holds endpoints models
 * resources/ - holds endpoints resources
-* requirements - holds all packages needed for project.
+* app.py - flask application initialization
+* config.py - holds config options for database
+* extensions.py - holds database initialization
+* requirements - holds all packages needed for project
 
 
 ## Running 
