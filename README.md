@@ -6,12 +6,23 @@ Project structure:
 ```
 
 .
-├── README.md
-├── app.py
+├── migrations
+|   ├── versions
+|   |   └── 06a629b95cbc_.py
+|   ├── README
+|   ├── alembic.ini
+|   ├── env.py
+|   └── script.py.mako
 ├── models
+|   ├── user.py
 |   └── recipe.py
 ├── resources
 |   └── recipe.py
+├── .gitignore
+├── README.md
+├── app.py
+├── config.py
+├── extensions.py
 └── requirements.txt
 
 ```
