@@ -59,7 +59,7 @@ RESPONSE
             "description": "This is a lovely tomato pasta recipe.",
             "id": 2,
             "name": "Tomato Pasta"
-        },
+        }
     ]
 }
 ```
@@ -78,7 +78,7 @@ REQUEST
 RESPONSE
 ```json
 {
-    "id": 3
+    "id": 3,
     "name": "Cheese Pizza",
     "description": "This is a lovely cheese pizza",
     "number_of_servings": 2,
