@@ -3,9 +3,8 @@ import os
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
-from flask_uploads import configure_uploads, patch_request_class
+from flask_uploads import configure_uploads
 
-from config import Config
 from extensions import db, jwt, image_set
 
 from resources.user import UserListResource, UserResource, UserRecipeListResource, UserAvatarUploadResource, MeResource
@@ -39,7 +38,6 @@ def register_extensions(app):
     migrate = Migrate(app, db)
     jwt.init_app(app)
     configure_uploads(app, image_set)
-    patch_request_class(app, 10 * 1024 * 1024)
 
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload):

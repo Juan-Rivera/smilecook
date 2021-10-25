@@ -3,7 +3,7 @@ Flask-RESTful
 Flask-SQLAlchemy
 Flask-Migrate
 Flask-JWT-Extended
-Flask-Uploads
+Flask-Reuploaded
 Flask-Script
 httpie
 psycopg2-binary

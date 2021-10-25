@@ -12,7 +12,7 @@ class Config:
     JWT_ERROR_MESSAGE_KEY = 'message'
 
     UPLOADED_IMAGES_DEST = 'static/images'
-
+    MAX_CONTENT_LENGTH = 10 * 1024 * 1024
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
