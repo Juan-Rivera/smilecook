@@ -12,3 +12,4 @@ marshmallow
 webargs
 Pillow
 sqlalchemy
+gunicorn
