@@ -3,8 +3,12 @@ from flask_restful import Resource
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from http import HTTPStatus
 
-# import Recipe model class
+
 from models.recipe import Recipe
+from schemas.recipe import RecipeSchema
+
+recipe_schema = RecipeSchema()
+recipe_list_schema = RecipeSchema(many=True)
 
 
 class RecipeListResource(Resource):
@@ -13,38 +17,59 @@ class RecipeListResource(Resource):
         # get all published recipes
         recipes = Recipe.get_all_published()
 
-        # initialize empty list to return
-        data = []
-
-        # iterate through recipe list appending any recipe that is published to data list
-        for recipe in recipes:
-            data.append(recipe.data())
-
         # return back data list with Status Code 200
-        return {'data': data}, HTTPStatus.OK
+        return recipe_list_schema.dump(recipes), HTTPStatus.OK
 
     # creates new recipe
     @jwt_required()
     def post(self):
         # pull data from request
-        data = request.get_json()
+        json_data = request.get_json()
 
         # identify current user
         current_user = get_jwt_identity()
 
-        # build out Recipe object from data
-        new_recipe = Recipe(name=data['name'],
-                            description=data['description'],
-                            num_of_servings=data['num_of_servings'],
-                            cook_time=data['cook_time'],
-                            directions=data['directions'],
-                            user_id=current_user)
+        data, errors = recipe_schema.load(data=json_data)
 
-        # save new recipe to recipe list
-        new_recipe.save()
+        if errors:
+            return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+
+        recipe = Recipe(**data)
+        recipe.user_id = current_user
+        recipe.save()
 
         # return new recipe with Status Code 201
-        return new_recipe.data(), HTTPStatus.CREATED
+        return recipe_schema.dump(recipe), HTTPStatus.CREATED
+
+
+    # patches recipe
+    @jwt_required()
+    def patch(self, recipe_id):
+        json_data = request.get_json()
+
+        data, errors = recipe_schema.load(data=json_data, partial=('name', ))
+
+        if errors:
+            return {'message': 'Validation Errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
+
+        recipe = Recipe.get_by_id(recipe_id=recipe_id)
+
+        if recipe is None:
+            return {'message': 'Recipe not found'}, HTTPStatus.NOT_FOUND
+
+        current_user = get_jwt_identity()
+
+        if current_user != recipe.user_id:
+            return {'message': 'Access is not allowed'}, HTTPStatus.FORBIDDEN
+
+        recipe.name = data.get('name') or recipe.name
+        recipe.description = data.get('description') or recipe.description
+        recipe.num_of_servings = data.get('num_of_servings') or recipe.num_of_servings
+        recipe.cook_time = data.get('cook_time') or recipe.cook_time
+        recipe.directions = data.get('directions') or recipe.directions
+
+        recipe.save()
+        return recipe_schema.dump(recipe), HTTPStatus.OK
 
 
 class RecipeResource(Resource):
