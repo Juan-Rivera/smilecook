@@ -8,7 +8,8 @@ Project structure:
 .
 ├── migrations
 |   ├── versions
-|   |   └── 06a629b95cbc_.py
+|   |   ├── 06a629b95cbc_.py
+|   |   └── da55315d0028_.py
 |   ├── README
 |   ├── alembic.ini
 |   ├── env.py
@@ -17,19 +18,31 @@ Project structure:
 |   ├── user.py
 |   └── recipe.py
 ├── resources
+|   ├── recipe.py
+|   ├── token.py
+|   └── user.py
+├── schemas
+|   ├── pagination.py
+|   ├── user.py
 |   └── recipe.py
+├── static
+|   └── images
+|       └── assets
 ├── .gitignore
 ├── README.md
 ├── app.py
 ├── config.py
 ├── extensions.py
-└── requirements.txt
+├── requirements.txt
+└── utils.py
 
 ```
 
 * migrations/ holds migration database tables
 * models/ - holds endpoints models
 * resources/ - holds endpoints resources
+* schemas/ - holds schemas for data validation
+* static/ - holds images/assets for avatar upload feature
 * app.py - flask application initialization
 * config.py - holds config options for database
 * extensions.py - holds database initialization
