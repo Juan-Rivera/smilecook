@@ -15,12 +15,13 @@ recipe_pagination_schema = RecipePaginationSchema(many=True)
 
 
 class RecipeListResource(Resource):
-    @use_kwargs({'page': fields.Int(missing=1),
+    @use_kwargs({'q': fields.Str(missing=''),
+                 'page': fields.Int(missing=1),
                  'per_page': fields.Int(missing=20)})
     # gets all published recipes
-    def get(self, page, per_page):
+    def get(self, q, page, per_page):
         # get all published recipes
-        paginated_recipes = Recipe.get_all_published(page, per_page)
+        paginated_recipes = Recipe.get_all_published(q, page, per_page)
 
         # return back data list with Status Code 200
         return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
