@@ -11,6 +11,8 @@ from resources.user import UserListResource, UserResource, UserRecipeListResourc
 from resources.token import TokenResource, RefreshResource, RevokeResource, block_list
 from resources.recipe import RecipeListResource, RecipeResource, RecipePublishResource
 
+migrate = Migrate()
+
 
 # initialize app with config from files config.py
 def create_app():
@@ -35,7 +37,7 @@ def create_app():
 def register_extensions(app):
     db.app = app
     db.init_app(app)
-    migrate = Migrate(app, db)
+    migrate.init_app(app, db)
     jwt.init_app(app)
     configure_uploads(app, image_set)
 
