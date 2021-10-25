@@ -1,15 +1,24 @@
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
 from http import HTTPStatus
 
 from utils import hash_password
 from models.user import User
+from schemas.user import UserSchema
 
+user_schema = UserSchema()
+user_public_schema = UserSchema(exclude=('email', ))
 
 class UserListResource(Resource):
     def post(self):
         json_data = request.get_json()
+
+        data, errors = user_schema.load(data=json_data)
+
+        if errors:
+            return {'message': 'Validation errors', 'errors': errors}, HTTPStatus.BAD_REQUEST
 
         username = json_data.get('username')
         email = json_data.get('email')
@@ -23,21 +32,10 @@ class UserListResource(Resource):
 
         password = hash_password(non_hash_password)
 
-        user = User(
-            username=username,
-            email=email,
-            password=password
-        )
-
+        user = User(**data)
         user.save()
 
-        data = {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-        }
-
-        return data, HTTPStatus.CREATED
+        return user_schema.dump(user), HTTPStatus.CREATED
 
 
 class UserResource(Resource):
@@ -51,16 +49,9 @@ class UserResource(Resource):
         current_user = get_jwt_identity()
 
         if current_user == user.id:
-            data = {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email
-            }
+            data = user_schema.dump(user)
         else:
-            data = {
-                'id': user.id,
-                'username': user.username
-            }
+            data = user_public_schema.dump(user)
 
         return data, HTTPStatus.OK
 
@@ -70,10 +61,4 @@ class MeResource(Resource):
     def get(self):
         user = User.get_by_id(id=get_jwt_identity())
 
-        data = {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email
-        }
-
-        return data, HTTPStatus.OK
+        return user_schema.dump(user), HTTPStatus.OK
