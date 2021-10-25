@@ -4,6 +4,7 @@ Flask-SQLAlchemy
 Flask-Migrate
 Flask-JWT-Extended
 Flask-Uploads
+Flask-Script
 httpie
 psycopg2-binary
 passlib
