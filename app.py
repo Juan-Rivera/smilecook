@@ -37,7 +37,6 @@ def create_app():
 def register_extensions(app):
     db.app = app
     db.init_app(app)
-    db.create_all()
     migrate.init_app(app, db)
     jwt.init_app(app)
     configure_uploads(app, image_set)
