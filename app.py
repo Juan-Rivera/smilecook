@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_migrate import Migrate
 from flask_restful import Api
@@ -13,8 +15,17 @@ from resources.recipe import RecipeListResource, RecipeResource, RecipePublishRe
 
 # initialize app with config from files config.py
 def create_app():
+    env = os.environ.get('ENV', 'Development')
+
+    if env == 'Production':
+        config_str = 'config.ProductionConfig'
+    elif env == 'Staging':
+        config_str = 'config.StagingConfig'
+    else:
+        config_str = 'config.DevelopmentConfig'
+
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_str)
 
     register_extensions(app)
     register_resources(app)
@@ -28,7 +39,7 @@ def register_extensions(app):
     migrate = Migrate(app, db)
     jwt.init_app(app)
     configure_uploads(app, image_set)
-    patch_request_class(app, 10, *1024 * 1024)
+    patch_request_class(app, 10 * 1024 * 1024)
 
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload):
