@@ -11,3 +11,4 @@ python-dotenv
 marshmallow
 webargs
 Pillow
+sqlalchemy
