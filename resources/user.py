@@ -7,17 +7,21 @@ from http import HTTPStatus
 from extensions import image_set
 
 from utils import hash_password, save_image
+from webargs import fields
+from webargs.flaskparser import use_kwargs
 
 from models.recipe import Recipe
 from models.user import User
 
-from schemas.recipe import RecipeSchema
 from schemas.user import UserSchema
+from schemas.recipe import RecipeSchema, RecipePaginationSchema
 
 user_schema = UserSchema()
 user_public_schema = UserSchema(exclude=('email', ))
 user_avatar_schema = UserSchema(only=('avatar_url', ))
+
 recipe_list_schema = RecipeSchema(many=True)
+recipe_pagination_schema = RecipePaginationSchema()
 
 
 class UserListResource(Resource):
@@ -66,7 +70,11 @@ class UserResource(Resource):
 
 
 class UserRecipeListResource(Resource):
-    def get(self, username, visibility):
+    @jwt_required(optional=True)
+    @use_kwargs({'page': fields.Int(missing=1),
+                 'per_page': fields.Int(missing=20),
+                 'visibility': fields.Str(missing='public')})
+    def get(self, username, page, per_page, visibility):
         user = User.get_by_username(username=username)
 
         if user is None:
@@ -79,9 +87,9 @@ class UserRecipeListResource(Resource):
         else:
             visibility = 'public'
 
-        recipes = Recipe.get_all_by_user(user_id=user.id, visibility=visibility)
+        paginated_recipes = Recipe.get_all_by_user(user_id=user.id, page=page, per_page=per_page, visibility=visibility)
 
-        return recipe_list_schema.dump(recipes), HTTPStatus.OK
+        return recipe_pagination_schema.dump(paginated_recipes), HTTPStatus.OK
 
 
 class UserAvatarUploadResource(Resource):
