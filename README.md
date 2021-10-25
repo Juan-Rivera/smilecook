@@ -38,7 +38,7 @@ Project structure:
 
 ```
 
-* migrations/ holds migration database tables
+* migrations/ - holds migration database tables
 * models/ - holds endpoints models
 * resources/ - holds endpoints resources
 * schemas/ - holds schemas for data validation
