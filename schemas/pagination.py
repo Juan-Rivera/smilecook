@@ -3,20 +3,6 @@ from marshmallow import Schema, fields
 from urllib.parse import urlencode
 
 
-def get_pagination_links(self, paginated_objects):
-    pagination_links = {
-        'first': self.get_url(page=1),
-        'last': self.get_url(page=paginated_objects.pages)
-    }
-
-    if paginated_objects.has_prev:
-        pagination_links['prev'] = self.get_url(page=paginated_objects.prev_num)
-
-    if paginated_objects.has_next:
-        pagination_links['next'] = self.get_url(page=paginated_objects.next_num)
-
-    return pagination_links
-
 
 class PaginationSchema(Schema):
     class Meta:
@@ -36,3 +22,17 @@ class PaginationSchema(Schema):
         query_args['page'] = page
 
         return '{}?{}'.format(request.base_url, urlencode(query_args))
+
+    def get_pagination_links(self, paginated_objects):
+        pagination_links = {
+            'first': self.get_url(page=1),
+            'last': self.get_url(page=paginated_objects.pages)
+        }
+
+        if paginated_objects.has_prev:
+            pagination_links['prev'] = self.get_url(page=paginated_objects.prev_num)
+
+        if paginated_objects.has_next:
+            pagination_links['next'] = self.get_url(page=paginated_objects.next_num)
+
+        return pagination_links
