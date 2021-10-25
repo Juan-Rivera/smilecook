@@ -1,12 +1,12 @@
+import os
+
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from http import HTTPStatus
+from extensions import image_set
 
-from webargs import fields
-from webargs.flaskparser import use_kwargs
-
-from utils import hash_password
+from utils import hash_password, save_image
 
 from models.recipe import Recipe
 from models.user import User
@@ -16,7 +16,7 @@ from schemas.user import UserSchema
 
 user_schema = UserSchema()
 user_public_schema = UserSchema(exclude=('email', ))
-
+user_avatar_schema = UserSchema(only=('avatar_url', ))
 recipe_list_schema = RecipeSchema(many=True)
 
 
@@ -82,6 +82,32 @@ class UserRecipeListResource(Resource):
         recipes = Recipe.get_all_by_user(user_id=user.id, visibility=visibility)
 
         return recipe_list_schema.dump(recipes), HTTPStatus.OK
+
+
+class UserAvatarUploadResource(Resource):
+    @jwt_required()
+    def put(self):
+        file = request.files.get('avatar')
+
+        if not file:
+            return {'message': 'Not a valid image'}, HTTPStatus.BAD_REQUEST
+
+        if not image_set.file_allowed(file, file.filename):
+            return {'message': 'File type not allowed'}, HTTPStatus.BAD_REQUEST
+
+        user = User.get_by_id(id=get_jwt_identity())
+
+        if user.avatar_image:
+            avatar_path = image_set.path(folder='avatars', filename=user.avatar_image)
+            if os.path.exists(avatar_path):
+                os.remove(avatar_path)
+
+        filename = save_image(image=file, folder='avatars')
+
+        user.avatar_image = filename
+        user.save()
+
+        return user_avatar_schema.dump(user), HTTPStatus.OK
 
 
 class MeResource(Resource):

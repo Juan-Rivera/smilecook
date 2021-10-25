@@ -1,11 +1,12 @@
 Flask
 Flask-RESTful
-httpie
 Flask-SQLAlchemy
 Flask-Migrate
+Flask-JWT-Extended
+Flask-Uploads
+httpie
 psycopg2-binary
 passlib
 python-dotenv
-Flask-JWT-Extended
 marshmallow
 webargs
